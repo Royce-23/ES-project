@@ -1,0 +1,6 @@
+.pio/
+.vscode/
+*.hex
+*.elf
+*.map
+!firmware/firmware.hex
