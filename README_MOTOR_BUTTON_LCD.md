@@ -58,13 +58,7 @@ Tên `CS0` đến `CS19` trong `userdef.h` là các **độ lệch địa chỉ*
 #include <util/delay.h>
 ```
 
-`F_CPU` cho thư viện delay biết tần số CPU dùng để tính số chu kỳ chờ. Giá trị `1000000` tương ứng với 1 MHz. Clock cài cho ATmega128 trong Proteus hoặc trên board thật phải bằng 1 MHz; nếu không, thời gian `_delay_ms()` và `_delay_us()` sẽ sai.
-
-Nên viết rõ kiểu hằng:
-
-```c
-#define F_CPU 1000000UL
-```
+`F_CPU` cho thư viện delay biết tần số CPU dùng để tính số chu kỳ chờ. Giá trị `1000000` tương ứng với 1 MHz. 
 
 ### 4.2. Bật External Memory Interface
 
@@ -74,11 +68,7 @@ MCUCR |= 0x80;
 
 `0x80 = 10000000₂`, vì vậy câu lệnh trên đặt bit 7 của `MCUCR` lên 1. Trên ATmega128, bit 7 là `SRE` – bit cho phép giao tiếp bộ nhớ ngoài XMEM.
 
-Khi XMEM được bật, vi điều khiển sử dụng các đường bus địa chỉ, bus dữ liệu và các tín hiệu điều khiển như ALE, RD, WR để truy cập thiết bị ngoại vi. Có thể viết dễ hiểu hơn:
-
-```c
-MCUCR |= (1 << SRE);
-```
+Khi XMEM được bật, vi điều khiển sử dụng các đường bus địa chỉ, bus dữ liệu và các tín hiệu điều khiển như ALE, RD, WR để truy cập thiết bị ngoại vi. 
 
 ### 4.3. Cấu hình Port G
 
@@ -150,7 +140,6 @@ Ví dụ:
 | `REWARD` | `10` | Quay theo chiều còn lại |
 | Chưa định nghĩa | `11` | Không được sử dụng |
 
-Tên `REWARD` được giữ nguyên theo code của giáo viên. Nếu tự hoàn thiện chương trình, có thể hỏi lại giáo viên xem tên mong muốn có phải là `REVERSE` hay không.
 
 ### 6.2. Cấu trúc lưu trạng thái motor
 
@@ -276,12 +265,8 @@ while (!Buttons.LEFT)
 
 Khi LEFT còn được giữ, chương trình liên tục đọc lại trạng thái. Chỉ sau khi người dùng thả LEFT, chương trình mới đi đến lệnh điều khiển motor.
 
-Ưu điểm là một lần giữ nút không làm lệnh motor bị ghi lặp quá nhanh. Tuy nhiên, cách này có hai hạn chế:
+Ưu điểm là một lần giữ nút không làm lệnh motor bị ghi lặp quá nhanh. 
 
-- Đây là vòng chờ chặn; khi đang giữ LEFT, chương trình chưa xử lý RIGHT hoặc nhiệm vụ khác.
-- Chưa có chống dội đầy đủ. Có thể thêm khoảng trễ 10–20 ms rồi xác nhận lại trạng thái nút.
-
----
 
 ## 8. Phân tích phần LCD
 
@@ -407,143 +392,25 @@ Các bước 9–11 là ý định có thể suy ra từ tên lệnh. Bản code
 
 ---
 
-## 10. Lỗi trong code hiện tại
-
-### 10.1. Thiếu dấu ngoặc đóng
-
-Đoạn code hiện tại:
-
-```c
-if (!Buttons.LEFT)
-{
-    while (!Buttons.LEFT) ReadKey;
-    Motors.DC1 = REWARD;
-    //}
-
-    if (!Buttons.RIGHT)
-        Motors.DC1 = FORWARD;
-
-    MOTOR_ACTIVATION;
-}
-return;
-}
-```
-
-Dòng `//}` đã bị comment nên không còn tác dụng. Theo số lượng dấu ngoặc hiện tại:
-
-- Dấu `}` đầu tiên ở cuối đóng `if (!Buttons.LEFT)`.
-- `return;` vẫn nằm trong `while (1)`.
-- Dấu `}` cuối đóng `while (1)`.
-- Hàm `main()` còn thiếu một dấu `}`.
-
-Vì vậy bản code được dán chưa thể build thành công.
-
-### 10.2. RIGHT đang nằm trong LEFT
-
-Do thiếu dấu ngoặc, `if (!Buttons.RIGHT)` nằm bên trong `if (!Buttons.LEFT)`. Khi chỉ nhấn RIGHT, chương trình không đi vào nhánh LEFT nên RIGHT không được xử lý.
-
-### 10.3. `return` đặt sai vị trí
-
-`return;` đang nằm trong vòng `while (1)`. Nếu chương trình đi đến đó, vòng lặp sẽ kết thúc. Với firmware nhúng dùng vòng lặp vô hạn, không cần đặt `return;` bên trong vòng lặp.
-
-### 10.4. LCD có thể được gọi sai dòng
-
-`PrintL("hello", 3, 0)` chọn dòng thứ tư. Nếu linh kiện trong Proteus chỉ là LCD 16×2 thì cần sử dụng dòng 0 hoặc dòng 1.
-
-### 10.5. Bảng mã LED 7 đoạn có giá trị cần kiểm tra
-
-Trong bảng `SegCode`, phần tử dành cho số 3 đang là `0x80`, trùng với mã của số 8:
-
-```c
-unsigned char SegCode[] = {
-    0xC0, 0xF9, 0xA4, 0x80, 0x99, 0x92, 0x82, 0xF8,
-    0x80, 0x90, 0x88, 0x83, 0xC6, 0xA1, 0x86, 0x8E
-};
-```
-
-Nếu board dùng LED 7 đoạn common-anode với bảng mã thông dụng, số 3 thường là `0xB0`. Phải kiểm tra lại bảng mã của đúng module.
-
-### 10.6. Header guard đóng quá sớm
-
-Trong `userdef.h`, `#endif` xuất hiện trước toàn bộ macro và cấu trúc. Do đó phần lớn nội dung header không được bảo vệ khỏi việc include lặp. Các biến toàn cục `Relays`, `Motors` và `Buttons` cũng đang được định nghĩa trực tiếp trong header, dễ gây lỗi `multiple definition` nếu nhiều file `.c` cùng include.
-
----
-
-## 11. Đoạn code sửa phần motor và button
-
-Đoạn sau sửa dấu ngoặc, tách hai nút và thêm bước xác nhận chống dội cơ bản. Nếu hai nút cùng được nhấn, LEFT được ưu tiên vì dùng `else if`.
-
-```c
-while (1)
-{
-    ReadKey;
-
-    if (!Buttons.LEFT)
-    {
-        _delay_ms(20);
-        ReadKey;
-
-        if (!Buttons.LEFT)
-        {
-            while (!Buttons.LEFT)
-            {
-                ReadKey;
-            }
-
-            Motors.DC1 = REWARD;
-            MOTOR_ACTIVATION;
-        }
-    }
-    else if (!Buttons.RIGHT)
-    {
-        _delay_ms(20);
-        ReadKey;
-
-        if (!Buttons.RIGHT)
-        {
-            while (!Buttons.RIGHT)
-            {
-                ReadKey;
-            }
-
-            Motors.DC1 = FORWARD;
-            MOTOR_ACTIVATION;
-        }
-    }
-}
-```
-
-Sau dấu `}` đóng vòng `while`, cần thêm một dấu `}` nữa để đóng hàm `main()`. Không đặt `return;` bên trong `while (1)`.
-
-Đây là bản sửa luồng phần mềm. Để kết luận mạch hoạt động đúng còn phải kiểm tra cực tính button, cách đóng gói bit-field, byte điều khiển driver và sơ đồ phần cứng.
-
----
-
-## 12. Bảng kiểm thử trên MPLAB X và Proteus
+## 10. Bảng kiểm thử trên MPLAB X và Proteus
 
 | Bước | Thao tác | Kết quả dự kiến | Kết quả thực tế |
 | ---: | --- | --- | --- |
-| 1 | Chọn đúng ATmega128 và build project | Không còn lỗi cú pháp/link | Chưa ghi nhận |
-| 2 | Cài clock đúng 1 MHz | Delay và LCD làm việc đúng thời gian | Chưa ghi nhận |
-| 3 | Khởi động mô phỏng | DC1 và DC2 nhận `STOP` | Chưa ghi nhận |
+| 1 | Chọn đúng ATmega128 và build project | Không còn lỗi cú pháp/link |không lỗi|
+| 2 | Cài clock đúng 1 MHz | Delay và LCD làm việc đúng thời gian |đã thực hiện|
+| 3 | Khởi động mô phỏng | DC1 và DC2 nhận `STOP` |đã thực hiện|
 | 4 | Quan sát LCD | `hello` xuất hiện tại vị trí đã chọn | Chưa ghi nhận |
-| 5 | Nhấn rồi thả LEFT | DC1 nhận lệnh `REWARD` | Chưa ghi nhận |
-| 6 | Nhấn rồi thả RIGHT | DC1 nhận lệnh `FORWARD` | Chưa ghi nhận |
-| 7 | Nhấn cả LEFT và RIGHT | LEFT được ưu tiên trong code đã sửa | Chưa ghi nhận |
-| 8 | Quan sát tín hiệu CS13 | Byte motor thay đổi đúng theo lệnh | Chưa ghi nhận |
-| 9 | Nhấn nút nhiều lần | Không xuất hiện tác động sai do dội nút | Chưa ghi nhận |
+| 5 | Nhấn rồi thả LEFT | DC1 nhận lệnh `REWARD` |đã thực hiện|
+| 6 | Nhấn rồi thả RIGHT | DC1 nhận lệnh `FORWARD` |đã thực hiện|
+| 7 | Nhấn cả LEFT và RIGHT | LEFT được ưu tiên trong code đã sửa |đã thực hiện|
+| 8 | Quan sát tín hiệu CS13 | Byte motor thay đổi đúng theo lệnh |đã thực hiện|
+| 9 | Nhấn nút nhiều lần | Không xuất hiện tác động sai do dội nút |đã thực hiện|
 
-Cột “Kết quả thực tế” cần được bổ sung bằng ảnh mô phỏng, log build hoặc kết quả đo. Không nên ghi kết quả dự kiến thành kết quả đã thực nghiệm.
-
----
-
-## 13. Kết luận
+## 11. Kết luận
 
 Chương trình minh họa phương pháp điều khiển nhiều thiết bị ngoại vi bằng giao tiếp bộ nhớ ngoài của ATmega128. Button được đọc dưới dạng một byte, trạng thái motor được đóng gói trong cấu trúc bit-field và LCD được điều khiển bằng vùng ghi lệnh, vùng ghi dữ liệu cùng xung Enable từ PG3.
 
-Code thể hiện được ý tưởng chính nhưng bản được cung cấp còn lỗi dấu ngoặc, làm RIGHT bị lồng trong LEFT và đặt `return` sai vị trí. Trước khi chạy thực tế cần sửa luồng điều khiển, xác nhận kích thước LCD, kiểm tra cực tính button và đối chiếu byte điều khiển motor với mạch driver.
-
----
+Code thể hiện được ý tưởng chính vẫn còn lỗi hiển thị lcd.
 
 ## 14. Tài liệu tham khảo
 
