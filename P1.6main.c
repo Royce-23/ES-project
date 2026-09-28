@@ -164,6 +164,5 @@ int main(void)
             MenuDisplay(menu, select);
         }
     }
-
     return 0;
 }
