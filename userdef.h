@@ -38,29 +38,51 @@ extern "C" {
 #define XMEM_CS18 18
 #define XMEM_CS19 19
 
+//define LCD
 #define LCDE_H (PORTG |= (1<<3))
 #define LCDE_L (PORTG &= ~(1<<3))
 #define LCDRS_H (PORTG |= (1<<4))
 #define LCDRS_L (PORTG &= ~(1<<4))
+
 //define external device
 #define LED0 *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS0)
 #define LED1 *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS1)
 #define LED2 *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS2)
 #define LED3 *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS3)
+
+//define LED7 (CS4567)
 #define LED7D1 *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS4)
 #define LED7D2 *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS5)
 #define LED7D3 *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS6)
 #define LED7D4 *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS7)
+
+//define LED7 (CS89)
 #define LED7IDCTR *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS8)
 #define LED7IDDATE *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS9)
+
 #define RELAYMAP *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS10)
 #define LCD_DATA *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS11)
 #define LCD_INS LCD_DATA
 #define MOTORDC *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS13)
+
+//define BUTTON
 #define BUTTON *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS14)
 #define RELAY_ACTIVATION (*(volatile unsigned char *) (EXMEM_ADD+XMEM_CS10)= *(unsigned char *) (&Relays))
 #define MOTOR_ACTIVATION (*(volatile unsigned char *) (EXMEM_ADD+XMEM_CS13)= *(unsigned char *) (&Motors))
 #define ReadKey (*(unsigned char *) (&Buttons) = *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS14))
+
+//bảng mã
+unsigned char SegCode [] = {0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8, 0x80, 
+    0x90, 0x88, 0x83, 0xC6, 0xA1, 0x86, 0x8E}; //mảng chứa các giá trị mã hóa của các số từ 0 đến 9 và A B C D E F
+
+//define DS18B20
+#define DS18B20 0
+#define OneWire_High (PORTB|=(1<<DS18B20))
+#define OneWire_Low (PORTB&=~(1<<DS18B20))
+#define OneWire_Master (DDRB|=(1<<DS18B20))
+#define OneWire_Free (DDRB&=~(1<<DS18B20))
+#define OneWire_State (PINB&(1<<DS18B20))
+
 //define struct
 struct bits {
 unsigned char RL0 : 1 ;
