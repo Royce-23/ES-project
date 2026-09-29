@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "ATmega128 - XC8",
+            "compilerPath": "C:/Program Files/Microchip/xc8/v4.00/bin/xc8-cc.exe",
+            "compilerArgs": [
+                "-mcpu=ATmega128",
+                "-mdfp=C:/Program Files/Microchip/MPLABX/v6.35/packs/Microchip/ATmega_DFP/3.6.299/xc8"
+            ],
+            "includePath": [
+                "${workspaceFolder}",
+                "C:/Program Files/Microchip/xc8/v4.00/avr/lib/gcc/avr/5.4.0/include",
+                "C:/Program Files/Microchip/xc8/v4.00/avr/include",
+                "C:/Program Files/Microchip/MPLABX/v6.35/packs/Microchip/ATmega_DFP/3.6.299/xc8/avr/include"
+            ],
+            "defines": [
+                "__ATmega128__",
+                "F_CPU=1000000UL"
+            ],
+            "cStandard": "c11",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}
+
