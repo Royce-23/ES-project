@@ -61,6 +61,21 @@ extern "C" {
 #define RELAY_ACTIVATION (*(volatile unsigned char *) (EXMEM_ADD+XMEM_CS10)= *(unsigned char *) (&Relays))
 #define MOTOR_ACTIVATION (*(volatile unsigned char *) (EXMEM_ADD+XMEM_CS13)= *(unsigned char *) (&Motors))
 #define ReadKey (*(unsigned char *) (&Buttons) = *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS14))
+
+// Bảng mã LED 7 đoạn: 0, 1, ..., 9, A, B, C, D, E, F
+unsigned char SegCode[] = {
+    0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8,
+    0x80, 0x90, 0x88, 0x83, 0xC6, 0xA1, 0x86, 0x8E
+};
+
+// DS18B20 nối với PB0
+#define DS18B20 0
+#define OneWire_High (PORTB |= (1 << DS18B20))
+#define OneWire_Low  (PORTB &= ~(1 << DS18B20))
+#define OneWire_Master (DDRB |= (1 << DS18B20))
+#define OneWire_Free   (DDRB &= ~(1 << DS18B20))
+#define OneWire_State  (PINB & (1 << DS18B20))
+
 //define struct
 struct bits {
 unsigned char RL0 : 1 ;

@@ -1,5 +1,6 @@
 param(
-    [switch]$Clean
+    [switch]$Clean,
+    [string]$Source = 'main.c'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -48,7 +49,18 @@ if (-not $dfpVersion) {
 }
 
 $dfpPath = Join-Path $dfpVersion.FullName 'xc8'
-$source = Join-Path $projectDir 'main.c'
+$projectFullPath = [System.IO.Path]::GetFullPath($projectDir)
+$sourceFullPath = [System.IO.Path]::GetFullPath((Join-Path $projectDir $Source))
+if (-not $sourceFullPath.StartsWith($projectFullPath + [System.IO.Path]::DirectorySeparatorChar)) {
+    throw 'File nguon phai nam trong thu muc project.'
+}
+if (-not (Test-Path -LiteralPath $sourceFullPath -PathType Leaf)) {
+    throw "Khong tim thay file nguon: $Source"
+}
+if ([System.IO.Path]::GetExtension($sourceFullPath).ToLowerInvariant() -ne '.c') {
+    throw 'File nguon phai co phan mo rong .c.'
+}
+$source = $sourceFullPath
 $elf = Join-Path $buildDir 'ES-project.elf'
 $hex = Join-Path $buildDir 'ES-project.hex'
 $map = Join-Path $buildDir 'ES-project.map'
@@ -90,4 +102,3 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host ''
 Write-Host 'BUILD THANH CONG' -ForegroundColor Green
 Write-Host "File nap Proteus: $hex" -ForegroundColor Green
-
