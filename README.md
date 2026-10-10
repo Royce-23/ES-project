@@ -1,199 +1,233 @@
 # ES Project – ATmega128
 
-Project dùng **ATmega128**, trình biên dịch **Microchip XC8 AVR** và mô phỏng trên **Proteus**.
+## 1. Giới thiệu
 
-## 1. Cấu trúc project
+Project gồm các bài thực hành P1.2 đến P1.8 trên vi điều khiển **ATmega128**, biên dịch bằng **Microchip XC8 AVR** và mô phỏng bằng **Proteus**.
 
-Các file bài thực hành hiện có:
+Mỗi lần chỉ biên dịch **một file `.c`**. Các file dùng chung như `userdef.h` không được biên dịch riêng.
 
-- `P1. 2 main.c`
-- `P1.3 main.c`
-- `P1.4 main.c`
-- `P1.5 main code simulate button and motor.c`
-- `P1.5 main code simulate lcd lm044l.c`
-- `P1.6main.c`
-- `P1.7main.c`
-- `P1.8 main.c`
+## 2. Cấu trúc file
 
-Các file dùng chung:
+| File | Chức năng chính |
+|---|---|
+| `P1. 2 main.c` | Điều khiển 32 LED qua bộ nhớ ngoài; có ví dụ xuất trực tiếp và xuất bằng hàm. |
+| `P1.3 main.c` | Hiển thị số trên LED 7 đoạn: xuất trực tiếp và quét nhiều LED. |
+| `P1.4 main.c` | Kiểm tra điều khiển relay bằng union/bit-field. |
+| `P1.5 main code simulate button and motor.c` | Đọc nút nhấn và điều khiển motor DC 1/2. |
+| `P1.5 main code simulate lcd lm044l.c` | Khởi tạo LCD LM044L và hiển thị menu cơ bản. |
+| `P1.6main.c` | Menu LCD kết hợp nút nhấn, relay và motor. |
+| `P1.7main.c` | Phiên bản menu LCD hoàn chỉnh hơn, có điều hướng bằng nút nhấn. |
+| `P1.8 main.c` | Menu LCD, LED 7 đoạn và đọc nhiệt độ DS18B20. |
+| `userdef.h` | Định nghĩa địa chỉ thiết bị, nút nhấn, relay, motor, LCD, LED 7 đoạn và giao thức DS18B20. |
+| `userdef copy.h` | Bản sao lưu của `userdef.h`; không được include khi build. |
+| `build.ps1` | Script biên dịch `.c` thành `.hex`. |
+| `.vscode/tasks.json` | Danh sách file để chọn khi nhấn `Ctrl + Shift + B`. |
+| `build/` | Chứa file `.elf`, `.hex` và `.map` sau khi build. |
 
-- `userdef.h`: định nghĩa địa chỉ bộ nhớ ngoài, LED, LCD, nút nhấn, relay, motor, LED 7 đoạn và DS18B20.
-- `build.ps1`: script biên dịch và tạo file HEX.
-- `.vscode/tasks.json`: cấu hình chọn file cần build trong VS Code.
-- `build/`: thư mục chứa kết quả build; thư mục này không đưa lên Git.
+## 3. Phần mềm cần cài
 
-## 2. Phần mềm cần cài
-
-Cần cài trên Windows:
+Trên Windows cần có:
 
 1. Visual Studio Code.
 2. Extension C/C++ của Microsoft.
-3. MPLAB XC8 AVR.
-4. MPLAB X Device Family Pack cho dòng ATmega.
-5. Proteus nếu muốn mô phỏng mạch.
+3. Microchip XC8 AVR.
+4. MPLAB X Device Family Pack cho ATmega.
+5. Proteus nếu muốn mô phỏng.
 
-Script tự tìm XC8 và Device Family Pack trong:
+`build.ps1` tự tìm compiler trong:
 
 ```text
 C:\Program Files\Microchip\xc8
 C:\Program Files\Microchip\MPLABX
 ```
 
-## 3. Mở project
+## 4. Mở project
 
-Mở đúng thư mục chứa file `build.ps1` bằng VS Code:
+Mở đúng thư mục chứa `build.ps1` bằng VS Code:
 
 ```text
 ES-project-VSCode
 ```
 
-Không mở riêng một file `.c`, vì VS Code có thể không nhận task build của project.
+Không nên mở riêng từng file `.c`, vì VS Code có thể không nhận được task build.
 
-## 4. Chọn file và build bằng VS Code
+## 5. Build bằng VS Code
 
-1. Mở project trong VS Code.
-2. Nhấn `Ctrl + Shift + B`.
-3. Chọn task `Build HEX for Proteus` nếu VS Code hỏi.
-4. Chọn file `.c` cần biên dịch.
-5. Chờ dòng thông báo `BUILD THANH CONG`.
+1. Nhấn `Ctrl + Shift + B`.
+2. Chọn task `Build HEX for Proteus`.
+3. Chọn file bài cần chạy.
+4. Chờ thông báo `BUILD THANH CONG`.
 
-Mỗi lần build, các file sau sẽ bị ghi đè:
+Kết quả được tạo tại:
 
 ```text
-build/ES-project.elf
 build/ES-project.hex
+build/ES-project.elf
 build/ES-project.map
 ```
 
-File dùng trong Proteus là `build/ES-project.hex`.
+File cần nạp vào Proteus là `build/ES-project.hex`.
 
-## 5. Build bằng PowerShell
+## 6. Build bằng PowerShell
 
-Build file mặc định `main.c`:
-
-```powershell
-.\build.ps1
-```
-
-Build một file cụ thể:
+Mở PowerShell tại thư mục project rồi chạy lệnh tương ứng:
 
 ```powershell
-.\build.ps1 -Source 'P1.8 main.c'
+.\build.ps1 -Source 'P1. 2 main.c'
 .\build.ps1 -Source 'P1.3 main.c'
 .\build.ps1 -Source 'P1.4 main.c'
+.\build.ps1 -Source 'P1.5 main code simulate button and motor.c'
+.\build.ps1 -Source 'P1.5 main code simulate lcd lm044l.c'
+.\build.ps1 -Source 'P1.6main.c'
 .\build.ps1 -Source 'P1.7main.c'
+.\build.ps1 -Source 'P1.8 main.c'
 ```
 
-Xóa kết quả build:
+Xóa kết quả build cũ:
 
 ```powershell
 .\build.ps1 -Clean
 ```
 
-## 6. Nạp chương trình vào Proteus
+Không dùng `.\build.ps1` không có `-Source` nếu project không có file `main.c` mặc định.
 
-1. Build file cần chạy.
-2. Mở mạch Proteus.
-3. Nhấp đúp vào `ATmega128`.
-4. Tại `Program File`, chọn `build/ES-project.hex`.
+## 7. Chạy file HEX trong Proteus
+
+1. Build đúng file `.c` cần kiểm tra.
+2. Mở sơ đồ Proteus.
+3. Nhấp đúp vào IC `ATMEGA128`.
+4. Trong `Program File`, chọn `build/ES-project.hex`.
 5. Đặt `Clock Frequency` là `1 MHz`.
 6. Chạy mô phỏng.
 
-Mỗi khi đổi bài, cần build lại và nạp lại file HEX vào ATmega128.
+Sau khi đổi bài, phải build lại và nạp lại file HEX vào ATmega128.
 
-## 7. Địa chỉ thiết bị bộ nhớ ngoài
+## 8. Mô tả từng bài
 
-Địa chỉ cơ sở trong `userdef.h` là `0x1100`:
+### P1.2 – 32 LED
 
-| Thiết bị | Địa chỉ |
-|---|---:|
-| `LED0` – `LED3` | `CS0` – `CS3` |
-| `LED7D1` – `LED7D4` | `CS4` – `CS7` |
-| Điều khiển LED quét | `CS8` – `CS9` |
+Ghi dữ liệu 32 bit ra bốn thanh ghi:
+
+```text
+LED0, LED1, LED2, LED3 → CS0, CS1, CS2, CS3
+```
+
+Bài dùng để kiểm tra ghi dữ liệu qua bộ nhớ ngoài. Có thể thay giá trị LED trong hàm `led_display()` để tạo mẫu sáng khác nhau.
+
+### P1.3 – LED 7 đoạn
+
+Có hai cách hiển thị:
+
+- Xuất trực tiếp từng LED qua `LED7D1` đến `LED7D4`.
+- Quét LED bằng `LED7IDDATE` và `LED7IDCTR`.
+
+LED 7 đoạn đang dùng loại **common-anode**, vì vậy mã hiển thị là mã mức thấp. Ví dụ số `3214` được hiển thị bằng:
+
+```c
+SevenSegDisplay(3214);
+```
+
+### P1.4 – Relay
+
+Dùng `Relays.relayall` hoặc từng bit `RL0` đến `RL7` để bật/tắt relay. Relay được ghi qua `RELAYMAP` tại `CS10`.
+
+### P1.5 – Nút nhấn và motor
+
+`P1.5 main code simulate button and motor.c` đọc các nút `LEFT`, `RIGHT`, `UP`, `DOWN`, `GO` và điều khiển motor qua `MOTORDC` tại `CS13`.
+
+Các trạng thái motor:
+
+```text
+STOP = 0
+FORWARD = 1
+REWARD = 2
+```
+
+`P1.5 main code simulate lcd lm044l.c` tập trung kiểm tra LCD LM044L và hiển thị chữ trên bốn dòng.
+
+### P1.6 và P1.7 – Menu LCD
+
+Hai file dùng LCD LM044L và các nút nhấn để:
+
+- `UP/DOWN`: di chuyển lựa chọn.
+- `RIGHT`: đi vào menu con.
+- `LEFT`: quay lại menu trước.
+- `GO`: thực hiện chức năng được chọn.
+
+Menu có các nhóm Sensors, Actuator và Settings. Phần Actuator dùng chung các cấu trúc relay/motor trong `userdef.h`.
+
+### P1.8 – DS18B20
+
+`P1.8 main.c` bổ sung:
+
+- Đọc nhiệt độ DS18B20 bằng giao thức 1-Wire.
+- Hiển thị nhiệt độ trên LCD.
+- Hiển thị phần nguyên trên bốn LED 7 đoạn.
+
+Trình tự sử dụng:
+
+```text
+Main Menu → Sensors → Temperature → GO
+```
+
+Nhấn `LEFT` để quay lại menu Sensors.
+
+## 9. Địa chỉ bộ nhớ ngoài
+
+Địa chỉ cơ sở được định nghĩa trong `userdef.h` là `0x1100`.
+
+| Thiết bị | Địa chỉ chọn |
+|---|---|
+| `LED0`–`LED3` | `CS0`–`CS3` |
+| `LED7D1`–`LED7D4` | `CS4`–`CS7` |
+| Điều khiển LED quét | `CS8`–`CS9` |
 | Relay | `CS10` |
 | LCD | `CS11` |
 | Motor DC | `CS13` |
 | Nút nhấn | `CS14` |
 
-ATmega128 phải bật bộ nhớ ngoài trước khi ghi thiết bị:
+ATmega128 phải bật giao tiếp bộ nhớ ngoài trước khi dùng các thiết bị:
 
 ```c
 MCUCR |= 0x80;
 XMCRA = 0;
 ```
 
-## 8. LED 7 đoạn
+## 10. Kết nối DS18B20
 
-Mạch đang dùng LED 7 đoạn **common-anode**, nên bảng mã trong `userdef.h` là mức thấp:
-
-```text
-0 -> 0xC0, 1 -> 0xF9, 2 -> 0xA4, ..., 9 -> 0x90
-```
-
-Ví dụ:
-
-```c
-SegDisplayD(1234);
-```
-
-Nếu phần cứng nối đúng CS4–CS7, LED sẽ hiển thị `1234` từ trái sang phải.
-
-Để kiểm tra riêng LED, tạm thay:
-
-```c
-Temp = ReadTemp();
-SegDisplayD(Temp);
-```
-
-bằng:
-
-```c
-SegDisplayD(1234);
-```
-
-## 9. DS18B20 trong P1.8
-
-DS18B20 được cấu hình ở chân `PB0`:
+Code hiện tại dùng chân `PB0`:
 
 ```c
 #define DS18B20 0
 ```
 
-Kết nối Proteus cần có:
+Kết nối trong Proteus:
 
-- `DQ` nối vào `PB0`.
-- `VCC` nối nguồn.
-- `GND` nối mass.
-- Điện trở kéo lên khoảng `4.7kΩ` từ `DQ` lên `VCC`.
+| DS18B20 | ATmega128 / nguồn |
+|---|---|
+| `VCC` | `+5V` |
+| `GND` | `GND` |
+| `DQ` | `PB0/SS` |
+| `DQ` | Kéo lên `+5V` qua điện trở khoảng `4.7kΩ–5kΩ` |
 
-P1.8 đọc nhiệt độ nguyên và hiển thị lên LED. Ví dụ `42°C` hiển thị thành `0042`.
+Nếu LCD báo `Sensor not found`, kiểm tra trước tiên:
 
-Nếu hiển thị `0000`, kiểm tra DQ, điện trở kéo lên, VCC/GND và thử chương trình LED bằng `SegDisplayD(1234)` như phần trên.
+1. `DQ` có thật sự nối tới `PB0` hay chưa.
+2. Điện trở kéo lên có nối tới `+5V` hay không.
+3. Clock của ATmega128 có đúng `1 MHz` hay không.
+4. Đã build đúng `P1.8 main.c` và nạp đúng file HEX chưa.
 
-## 10. Xử lý lỗi thường gặp
+## 11. Kiểm tra nhanh phần cứng
 
-### Không tìm thấy XC8
+- Không sáng LED: kiểm tra `CS0`–`CS7`, loại LED common-anode và bảng mã `SegCode`.
+- LCD không hiển thị: kiểm tra `CS11`, các đường `LCDRS`, `LCDE` và nguồn LCD.
+- Nút nhấn không hoạt động: kiểm tra `CS14` và các đường `BT0`–`BT7`.
+- Relay/motor không chạy: kiểm tra lần lượt `CS10`, `CS13` và dữ liệu điều khiển.
+- DS18B20 không đọc được: kiểm tra `PB0`, DQ và điện trở kéo lên.
 
-Kiểm tra XC8 đã cài trong:
+## 12. Lưu ý khi chỉnh sửa
 
-```text
-C:\Program Files\Microchip\xc8
-```
-
-### Không thấy file mới trong danh sách build
-
-Thêm tên file vào `options` của input `esSourceFile` trong `.vscode/tasks.json`.
-
-### Proteus không chạy chương trình mới
-
-Build lại, chọn lại `build/ES-project.hex` trong thuộc tính ATmega128 và kiểm tra clock là `1 MHz`.
-
-### Xóa file build cũ
-
-Chạy:
-
-```powershell
-.\build.ps1 -Clean
-```
-
-Sau đó build lại file cần chạy.
+- Chỉ sửa file `userdef.h` khi cần thay đổi địa chỉ hoặc chân phần cứng.
+- `userdef copy.h` chỉ để tham khảo/khôi phục, không dùng để build.
+- Không đổi tên các file `.c` nếu chưa cập nhật `.vscode/tasks.json`.
+- Sau mỗi thay đổi code, phải build lại file HEX trước khi chạy Proteus.

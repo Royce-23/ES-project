@@ -4,6 +4,11 @@
 #define XC_HEADER_TEMPLATE_H
 #include <xc.h> // include processor files each processor file is guarded.
 #include<stddef.h>
+#include <stdint.h>
+#ifndef F_CPU
+#define F_CPU 1000000UL
+#endif
+#include <util/delay.h>
 #ifdef __cplusplus
 extern "C" {
 #endif /*_ cplusplus */
@@ -42,6 +47,7 @@ extern "C" {
 #define LCDE_L (PORTG &= ~(1<<3))
 #define LCDRS_H (PORTG |= (1<<4))
 #define LCDRS_L (PORTG &= ~(1<<4))
+
 //define external device
 #define LED0 *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS0)
 #define LED1 *(volatile unsigned char *) (EXMEM_ADD+XMEM_CS1)
@@ -68,13 +74,99 @@ unsigned char SegCode[] = {
     0x80, 0x90, 0x88, 0x83, 0xC6, 0xA1, 0x86, 0x8E
 };
 
-// DS18B20 nối với PB0
+/* DS18B20: DATA nối PB0, bắt buộc có điện trở kéo lên 4.7 kOhm tới +5 V. */
 #define DS18B20 0
 #define OneWire_High (PORTB |= (1 << DS18B20))
 #define OneWire_Low  (PORTB &= ~(1 << DS18B20))
 #define OneWire_Master (DDRB |= (1 << DS18B20))
 #define OneWire_Free   (DDRB &= ~(1 << DS18B20))
 #define OneWire_State  (PINB & (1 << DS18B20))
+
+/* 1-Wire primitives used by P1.8.  Return values are 0/1. */
+static uint8_t OneWire_Reset(void)
+{
+    uint8_t present;
+
+    OneWire_High;
+    OneWire_Master;
+    OneWire_Low;
+    _delay_us(500);
+    OneWire_Free;
+    _delay_us(70);
+    present = (OneWire_State == 0U);
+    _delay_us(430);
+    return present;
+}
+
+static void OneWire_WriteBit(uint8_t bit_value)
+{
+    OneWire_Master;
+    OneWire_Low;
+    if (bit_value != 0U) {
+        _delay_us(6);
+        OneWire_Free;
+        _delay_us(64);
+    } else {
+        _delay_us(60);
+        OneWire_Free;
+        _delay_us(10);
+    }
+}
+
+static uint8_t OneWire_ReadBit(void)
+{
+    uint8_t bit_value;
+
+    OneWire_Master;
+    OneWire_Low;
+    _delay_us(6);
+    OneWire_Free;
+    _delay_us(9);
+    bit_value = (OneWire_State != 0U);
+    _delay_us(55);
+    return bit_value;
+}
+
+static void OneWire_WriteByte(uint8_t byte_value)
+{
+    uint8_t bit_index;
+    for (bit_index = 0U; bit_index < 8U; ++bit_index) {
+        OneWire_WriteBit(byte_value & 0x01U);
+        byte_value >>= 1;
+    }
+}
+
+static uint8_t OneWire_ReadByte(void)
+{
+    uint8_t bit_index;
+    uint8_t byte_value = 0U;
+    for (bit_index = 0U; bit_index < 8U; ++bit_index) {
+        if (OneWire_ReadBit() != 0U) {
+            byte_value |= (uint8_t)(1U << bit_index);
+        }
+    }
+    return byte_value;
+}
+
+/* Returns 1 when a DS18B20 is present. Temperature is in 1/16 degree C. */
+static uint8_t DS18B20_ReadTemperatureQ4(int16_t *temperature_q4)
+{
+    uint8_t lsb;
+    uint8_t msb;
+
+    if (OneWire_Reset() == 0U) return 0U;
+    OneWire_WriteByte(0xCCU);       /* Skip ROM: one sensor on the bus. */
+    OneWire_WriteByte(0x44U);       /* Convert T. */
+    _delay_ms(750);                 /* Safe for 12-bit resolution. */
+
+    if (OneWire_Reset() == 0U) return 0U;
+    OneWire_WriteByte(0xCCU);
+    OneWire_WriteByte(0xBEU);       /* Read scratchpad. */
+    lsb = OneWire_ReadByte();
+    msb = OneWire_ReadByte();
+    *temperature_q4 = (int16_t)(((uint16_t)msb << 8) | lsb);
+    return 1U;
+}
 
 //define struct
 struct bits {

@@ -1,26 +1,24 @@
-#include <stddef.h>
+#define F_CPU 1000000UL
+#include <xc.h>
 #include "userdef.h"
-#ifndef F_CPU
-#define F_CPU 1000000
-#endif
 #include <util/delay.h>
 
-unsigned long led = 0x55555555; // 01010101010101010101010101010101
-int i;
 
-void SegDisplayD(unsigned int value) {
-    LED7D1 = SegCode[value % 10];               //số hàng đơn vị
-    LED7D2 = SegCode[(value / 10) % 10];         //số hàng chục
-    LED7D3 = SegCode[(value / 100) % 10];    //số hàng trăm
-    LED7D4 = SegCode[(value / 1000) % 10];  //số hàng nghìn
-}
-
-///sub_P1.8///
 static void LCDPulseEnable(void)
 {
     LCDE_H;
     _delay_us(2);
     LCDE_L;
+}
+
+/* Four common-anode seven-segment digits, driven through CS4..CS7. */
+static void SegDisplayD(uint16_t value)
+{
+    if (value > 9999U) value = 9999U;
+    LED7D1 = SegCode[value % 10U];
+    LED7D2 = SegCode[(value / 10U) % 10U];
+    LED7D3 = SegCode[(value / 100U) % 10U];
+    LED7D4 = SegCode[(value / 1000U) % 10U];
 }
 
 static void LCDWriteCommand(unsigned char command)
@@ -65,7 +63,6 @@ void LCDInit(void)
 void PrintL (const char *str, unsigned char line, unsigned char col) 
 {
     static const unsigned char line_address[4] = {0x80, 0xC0, 0x94, 0xD4};
-
     if ((line > 3) || (col > 19)) {
         return;
     }
@@ -77,115 +74,88 @@ void PrintL (const char *str, unsigned char line, unsigned char col)
 }
 void MenuDisplay (Menu *menu, unsigned char select)
 {
+LCDWriteCommand(0x01);
 PrintL (menu->Title ,0,0);
 PrintL (menu->List1 ,1,0);
 PrintL (menu->List2 ,2,0);
 PrintL (menu->List3 ,3,0);
 PrintL(">", select, 0);
 }
-///P1.8b///One-Wire DS18B20//////
-/*One-wire interface*/
-char OneWireReset(void) {
-    char Presence;
-    OneWire_Master;
-    OneWire_Low;
-    _delay_us(480);
-    OneWire_High;
-    OneWire_Free;
-    _delay_us(80);
-    Presence = OneWire_State;
-    _delay_us(60);
-    return Presence;
-}
-void OneWireWriteByte(unsigned char Byte) {
-    unsigned char i;
-    for (i=0; i<8; i++) {
-        OneWire_Master;
-        if (Byte&0x01) {
-            OneWire_Low;
-            _delay_us(6);
-            OneWire_High;
-            OneWire_Free;
-            _delay_us(64);
-        }
-        else {
-            OneWire_Low;
-            _delay_us(60);
-            OneWire_High;
-            OneWire_Free;
-            _delay_us(10);
-        }
-        Byte = Byte>>1;
+
+static void PrintTemperature(int16_t temperature_q4)
+{
+    char text[17];
+    uint16_t magnitude;
+    uint16_t integer_part;
+    uint8_t decimal_part;
+    uint8_t pos = 0U;
+
+    if (temperature_q4 < 0) {
+        text[pos++] = '-';
+        magnitude = (uint16_t)(-(temperature_q4 + 1)) + 1U;
+    } else {
+        magnitude = (uint16_t)temperature_q4;
     }
-}
-unsigned char OneWireReadByte(void) {
-    unsigned char i;
-    unsigned char Byte = 0;
-    for (i=0; i<8; i++) {
-        OneWire_Master;
-        OneWire_Low;
-        _delay_us(3);
-        OneWire_High;
-        OneWire_Free;
-        _delay_us(10);
-        Byte >>= 1;
-        if (OneWire_State) {
-            Byte |= 0x80;
-        }
-        _delay_us(50);
-    }
-    return Byte;
+
+    integer_part = magnitude >> 4;
+    decimal_part = (uint8_t)(((magnitude & 0x0FU) * 100U + 8U) >> 4);
+    if (integer_part >= 100U) text[pos++] = (char)('0' + (integer_part / 100U));
+    if (integer_part >= 10U) text[pos++] = (char)('0' + ((integer_part / 10U) % 10U));
+    text[pos++] = (char)('0' + (integer_part % 10U));
+    text[pos++] = '.';
+    text[pos++] = (char)('0' + (decimal_part / 10U));
+    text[pos++] = (char)('0' + (decimal_part % 10U));
+    text[pos++] = ' ';
+    text[pos++] = 'C';
+    text[pos] = '\0';
+    PrintL(text, 2, 5);
 }
 
-unsigned int ReadTemp(void) {
-    unsigned char data [2];
-    signed int rawTemperature;
-    if (!OneWireReset()) {
-        OneWireWriteByte(0xCC);
-        OneWireWriteByte(0x44);
-        OneWire_Free;
-        _delay_ms(750);
-        if (OneWireReset()) {
-            return 0;
-        }
-        OneWireWriteByte(0xCC);
-        OneWireWriteByte(0xBE);
-        data[0] = OneWireReadByte();
-        data[1] = OneWireReadByte();
-        rawTemperature = (signed int)(((unsigned int)data[1] << 8) | data[0]);
-        if (rawTemperature < 0) {
-            return 0;
-        }
-        return (unsigned int)(rawTemperature / 16);
-    }
-    else 
-       return 0;
-}
+/* Temperature screen: press LEFT to return to the Sensor menu. */
+static void ShowTemperatureScreen(void)
+{
+    int16_t temperature_q4;
 
-int main(void) {
-    unsigned int Temp;
-    // unsigned char data; // Chưa sử dụng trong bài P1.8
-    unsigned char select = 1;
-    Menu *menu;
-    MCUCR |= 0x80;
-    XMCRA = 0;
-    DDRG |= (1 << 3) | (1 << 4);
+    LCDWriteCommand(0x01);
+    PrintL("DS18B20 1-WIRE", 0, 2);
+    PrintL("Temperature:", 1, 2);
 
-    menu = &MainMenu;
-    LCDInit();
-    PrintL("Test one-wire",0,0);
-    
     while (1) {
-        Temp = ReadTemp();
-        SegDisplayD(Temp);
+        if (DS18B20_ReadTemperatureQ4(&temperature_q4) != 0U) {
+            PrintL("                ", 2, 0);
+            PrintTemperature(temperature_q4);
+            /* 25.06 C is shown as 0025 on the four seven-segment digits. */
+            SegDisplayD((uint16_t)((temperature_q4 < 0) ?
+                        -(temperature_q4 / 16) : (temperature_q4 / 16)));
+            PrintL("LEFT: Back      ", 3, 0);
+        } else {
+            PrintL("Sensor not found", 2, 1);
+            PrintL("Check PB0/pullup", 3, 1);
+        }
+
+        ReadKey;
+        if (!Buttons.LEFT) {
+            while (!Buttons.LEFT) ReadKey;
+            break;
+        }
     }
+}
 
-    while (1);
-    MenuDisplay(menu, select);
+int main(void)
+{
+unsigned char select = 1;
+Menu *menu;
+MCUCR |=0x80;
+XMCRA = 0;
+DDRG =0x1f;
+OneWire_High;
+OneWire_Free;
+menu = &MainMenu;
+LCDInit();
+MenuDisplay (menu, select);
 
-///sub_P1.8///
-    while(1)
-    {
+ while (1)
+{
  ReadKey;
  if (!Buttons.DOWN)
  {
@@ -209,12 +179,14 @@ int main(void) {
  case 2: menu= (menu->Menulist2 == NULL)? menu: menu->Menulist2;break;
  case 3: menu= (menu->Menulist3 == NULL)? menu: menu->Menulist3;break;
  }
+ select = 1;
  MenuDisplay (menu, select);
  } 
  if (!Buttons.LEFT)
  {
  while(!Buttons.LEFT) ReadKey;
  menu= (menu->pre == NULL)? menu: menu->pre;
+ select = 1;
  MenuDisplay (menu, select);
  }
  if (!Buttons.GO)
@@ -222,6 +194,10 @@ int main(void) {
     while(!Buttons.GO) ReadKey;
     switch (select) {
     case 1:
+        if (menu == &TempMenu) {
+            ShowTemperatureScreen();
+            MenuDisplay(menu, select);
+        }
         if (menu->ActivationON != NULL) {
             menu->ActivationON(menu->MenuID, ON);
         }
