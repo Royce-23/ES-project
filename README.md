@@ -228,6 +228,5 @@ Nếu LCD báo `Sensor not found`, kiểm tra trước tiên:
 ## 12. Lưu ý khi chỉnh sửa
 
 - Chỉ sửa file `userdef.h` khi cần thay đổi địa chỉ hoặc chân phần cứng.
-- `userdef copy.h` chỉ để tham khảo/khôi phục, không dùng để build.
 - Không đổi tên các file `.c` nếu chưa cập nhật `.vscode/tasks.json`.
 - Sau mỗi thay đổi code, phải build lại file HEX trước khi chạy Proteus.
