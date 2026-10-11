@@ -19,7 +19,6 @@ Mỗi lần chỉ biên dịch **một file `.c`**. Các file dùng chung như `
 | `P1.7main.c` | Phiên bản menu LCD hoàn chỉnh hơn, có điều hướng bằng nút nhấn. |
 | `P1.8 main.c` | Menu LCD, LED 7 đoạn và đọc nhiệt độ DS18B20. |
 | `userdef.h` | Định nghĩa địa chỉ thiết bị, nút nhấn, relay, motor, LCD, LED 7 đoạn và giao thức DS18B20. |
-| `userdef copy.h` | Bản sao lưu của `userdef.h`; không được include khi build. |
 | `build.ps1` | Script biên dịch `.c` thành `.hex`. |
 | `.vscode/tasks.json` | Danh sách file để chọn khi nhấn `Ctrl + Shift + B`. |
 | `build/` | Chứa file `.elf`, `.hex` và `.map` sau khi build. |
