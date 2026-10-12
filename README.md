@@ -192,31 +192,7 @@ MCUCR |= 0x80;
 XMCRA = 0;
 ```
 
-## 10. Kết nối DS18B20
-
-Code hiện tại dùng chân `PB0`:
-
-```c
-#define DS18B20 0
-```
-
-Kết nối trong Proteus:
-
-| DS18B20 | ATmega128 / nguồn |
-|---|---|
-| `VCC` | `+5V` |
-| `GND` | `GND` |
-| `DQ` | `PB0/SS` |
-| `DQ` | Kéo lên `+5V` qua điện trở khoảng `4.7kΩ–5kΩ` |
-
-Nếu LCD báo `Sensor not found`, kiểm tra trước tiên:
-
-1. `DQ` có thật sự nối tới `PB0` hay chưa.
-2. Điện trở kéo lên có nối tới `+5V` hay không.
-3. Clock của ATmega128 có đúng `1 MHz` hay không.
-4. Đã build đúng `P1.8 main.c` và nạp đúng file HEX chưa.
-
-## 11. Kiểm tra nhanh phần cứng
+## 10. Kiểm tra nhanh phần cứng
 
 - Không sáng LED: kiểm tra `CS0`–`CS7`, loại LED common-anode và bảng mã `SegCode`.
 - LCD không hiển thị: kiểm tra `CS11`, các đường `LCDRS`, `LCDE` và nguồn LCD.
@@ -224,7 +200,7 @@ Nếu LCD báo `Sensor not found`, kiểm tra trước tiên:
 - Relay/motor không chạy: kiểm tra lần lượt `CS10`, `CS13` và dữ liệu điều khiển.
 - DS18B20 không đọc được: kiểm tra `PB0`, DQ và điện trở kéo lên.
 
-## 12. Lưu ý khi chỉnh sửa
+## 11. Lưu ý khi chỉnh sửa
 
 - Chỉ sửa file `userdef.h` khi cần thay đổi địa chỉ hoặc chân phần cứng.
 - Không đổi tên các file `.c` nếu chưa cập nhật `.vscode/tasks.json`.
