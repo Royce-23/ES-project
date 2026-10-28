@@ -35,6 +35,9 @@ Trên Windows cần có:
 4. MPLAB X Device Family Pack cho ATmega.
 5. Proteus để mô phỏng.
 
+L?u ?: tr?n m?y m?i b?t bu?c ph?i c?i **Microchip XC8 AVR** v? **ATmega Device Family Pack** tr??c khi build. Project kh?ng th? t? bi?n d?ch n?u thi?u compiler XC8. Visual Studio Code v? extension C/C++ ch? c?n cho vi?c ch?nh s?a/b?m build; Proteus ch? c?n khi m? ph?ng.
+
+
 `build.ps1` tự tìm compiler trong:
 
 ```text
