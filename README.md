@@ -31,7 +31,7 @@ Trên Windows cần có:
 2. Extension C/C++ của Microsoft.
 3. Microchip XC8 AVR.
 4. MPLAB X Device Family Pack cho ATmega.
-5. Proteus nếu muốn mô phỏng.
+5. Proteus để mô phỏng.
 
 `build.ps1` tự tìm compiler trong:
 
