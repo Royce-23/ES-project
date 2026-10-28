@@ -194,16 +194,9 @@ MCUCR |= 0x80;
 XMCRA = 0;
 ```
 
-## 10. Kiểm tra nhanh phần cứng
+## 10. Lưu ý khi chỉnh sửa
 
-- Không sáng LED: kiểm tra `CS0`–`CS7`, loại LED common-anode và bảng mã `SegCode`.
-- LCD không hiển thị: kiểm tra `CS11`, các đường `LCDRS`, `LCDE` và nguồn LCD.
-- Nút nhấn không hoạt động: kiểm tra `CS14` và các đường `BT0`–`BT7`.
-- Relay/motor không chạy: kiểm tra lần lượt `CS10`, `CS13` và dữ liệu điều khiển.
-- DS18B20 không đọc được: kiểm tra `PB0`, DQ và điện trở kéo lên.
-
-## 11. Lưu ý khi chỉnh sửa
-
+- P1.8 main.c là chương trình nguồn hoàn chỉnh duy nhất dùng để đánh giá toàn bộ mạch mô phỏng Proteus.
 - Chỉ sửa file `userdef.h` khi cần thay đổi địa chỉ hoặc chân phần cứng.
 - Không đổi tên các file `.c` nếu chưa cập nhật `.vscode/tasks.json`.
 - Sau mỗi thay đổi code, phải build lại file HEX trước khi chạy Proteus.
