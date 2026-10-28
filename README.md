@@ -159,6 +159,8 @@ Menu có các nhóm Sensors, Actuator và Settings. Phần Actuator dùng chung 
 
 ### P1.8 – DS18B20
 
+P1.8 main.c là phiên bản tổng hợp hoàn chỉnh nhất, dùng để biên dịch nạp vào ATmega128 điều khiển toàn bộ mô phỏng Proteus:
+
 `P1.8 main.c` bổ sung:
 
 - Đọc nhiệt độ DS18B20 bằng giao thức 1-Wire.
