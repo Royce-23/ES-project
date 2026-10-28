@@ -25,25 +25,55 @@ Mỗi lần chỉ biên dịch **một file `.c`**. Các file dùng chung như `
 | `.vscode/tasks.json` | Danh sách file để chọn khi nhấn `Ctrl + Shift + B`. |
 | `build/` | Chứa file `.elf`, `.hex` và `.map` sau khi build. |
 
-## 3. Phần mềm cần cài
+## 3. Ph?n m?m c?n c?i
 
-Trên Windows cần có:
+### 3.1. Ph?n m?m b?t bu?c ?? bi?n d?ch
 
-1. Visual Studio Code.
-2. Extension C/C++ của Microsoft.
-3. Microchip XC8 AVR.
-4. MPLAB X Device Family Pack cho ATmega.
-5. Proteus để mô phỏng.
+Tr?n m?y Windows m?i, c?n c?i ?? **c? hai** th?nh ph?n sau:
 
-L?u ?: tr?n m?y m?i b?t bu?c ph?i c?i **Microchip XC8 AVR** v? **ATmega Device Family Pack** tr??c khi build. Project kh?ng th? t? bi?n d?ch n?u thi?u compiler XC8. Visual Studio Code v? extension C/C++ ch? c?n cho vi?c ch?nh s?a/b?m build; Proteus ch? c?n khi m? ph?ng.
+1. **Microchip MPLAB XC8 AVR Compiler**: compiler bi?n d?ch m? C cho ATmega128.
+2. **Microchip MPLAB X IDE v? ATmega Device Family Pack**:
+   - M? `Tools ? Packs ? Pack Manager` trong MPLAB X IDE.
+   - T?m `ATmega_DFP` ho?c `Microchip ATmega Device Family Pack` v? c?i phi?n b?n m?i nh?t.
+   - G?i n?y cung c?p th?ng tin thanh ghi, th? vi?n v? linker script cho ATmega128.
 
-
-`build.ps1` tự tìm compiler trong:
+???ng d?n c?n c? d?ng:
 
 ```text
-C:\Program Files\Microchip\xc8
-C:\Program Files\Microchip\MPLABX
+C:\Program Files\Microchip\xc8\<version>
+C:\Program Files\Microchip\MPLABX\<version>\packs\Microchip\ATmega_DFP\<version>
 ```
+
+### 3.2. Ph?n m?m t?y ch?n
+
+- **Visual Studio Code** v? extension **C/C++** c?a Microsoft: d?ng ?? m?, s?a v? build b?ng giao di?n.
+- **Proteus**: ch? c?n khi mu?n m? ph?ng m?ch; kh?ng c?n ?? bi?n d?ch.
+
+Kh?ng c?n c?i Python, CMake, Make ho?c npm.
+
+### 3.3. Ki?m tra v? ch?y build
+
+M? PowerShell t?i th? m?c `Source code` (th? m?c ch?a `build.ps1`) v? ch?y:
+
+```powershell
+.\setup.ps1
+```
+
+N?u hi?n `Moi truong da san sang`, build m?c ??nh P1.8:
+
+```powershell
+.\build.ps1
+```
+
+Build b?i kh?c b?ng t?n file C:
+
+```powershell
+.\build.ps1 -Source 'P1.3 main.c'
+```
+
+File n?p Proteus sau khi build n?m t?i `Source code\build\ES-project.hex`. File HEX m?u c? s?n n?m t?i `release\ES-project-P1.8.hex`.
+
+N?u g?p l?i `Khong tim thay thu muc ATmega_DFP trong XC8`, h?y c?i ATmega Device Family Pack theo m?c 3.1 r?i ch?y l?i hai l?nh tr?n.
 
 ## 4. Mở project
 
