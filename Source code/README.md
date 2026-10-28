@@ -50,7 +50,7 @@ C:\Program Files\Microchip\MPLABX
 Mở đúng thư mục chứa `build.ps1` bằng VS Code:
 
 ```text
-ES-project-VSCode
+Source code 
 ```
 
 Không nên mở riêng từng file `.c`, vì VS Code có thể không nhận được task build.
