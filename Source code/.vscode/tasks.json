@@ -46,7 +46,7 @@
             "type": "pickString",
             "description": "Chon file C can build",
             "options": [
-                "P1. 2 main.c",
+                "P1.2 main.c",
                 "P1.3 main.c",
                 "P1.4 main.c",
                 "P1.5 main code simulate button and motor.c",
@@ -55,7 +55,7 @@
                 "P1.7main.c",
                 "P1.8 main.c"
             ],
-            "default": "P1. 8 main.c"
+            "default": "P1.8 main.c"
         }
     ]
 }
