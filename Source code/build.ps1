@@ -1,6 +1,6 @@
 param(
     [switch]$Clean,
-    [string]$Source = 'main.c'
+    [string]$Source = 'P1.8 main.c'
 )
 
 $ErrorActionPreference = 'Stop'
