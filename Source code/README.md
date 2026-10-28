@@ -1,4 +1,4 @@
-﻿# ES Project – ATmega128
+# ES Project – ATmega128
 
 ## 1. Giới thiệu
 
@@ -202,27 +202,3 @@ XMCRA = 0;
 - Chỉ sửa file `userdef.h` khi cần thay đổi địa chỉ hoặc chân phần cứng.
 - Không đổi tên các file `.c` nếu chưa cập nhật `.vscode/tasks.json`.
 - Sau mỗi thay đổi code, phải build lại file HEX trước khi chạy Proteus.
-
-## 11. Cài đặt và build trên máy khác
-
-Cần cài **MPLAB XC8 bản AVR** và **MPLAB X IDE** (để có ATmega Device Family Pack). Không cần cài Python, CMake, Make hoặc npm.
-
-Kiểm tra môi trường lần đầu:
-
-```powershell
-.\setup.ps1
-```
-
-Build mặc định file P1.8:
-
-```powershell
-.\build.ps1
-```
-
-Chọn bài khác:
-
-```powershell
-.\build.ps1 -Source 'P1.3 main.c'
-```
-
-File HEX sau khi build nằm tại `build\ES-project.hex`. Bản HEX mẫu nằm tại `release\ES-project-P1.8.hex`.
