@@ -17,8 +17,8 @@ Mỗi lần chỉ biên dịch **một file `.c`**. Các file dùng chung như `
 | `P1.4 main.c` | Kiểm tra điều khiển relay bằng union/bit-field. |
 | `P1.5 main code simulate button and motor.c` | Đọc nút nhấn và điều khiển motor DC 1/2. |
 | `P1.5 main code simulate lcd lm044l.c` | Khởi tạo LCD LM044L và hiển thị menu cơ bản. |
-| `P1.6main.c` | Menu LCD kết hợp nút nhấn, relay và motor. |
-| `P1.7main.c` | Phiên bản menu LCD hoàn chỉnh hơn, có điều hướng bằng nút nhấn. |
+| `P1.6main.c` | Sử dụng danh sách liên kết tạo menu tương tác trên LCD. |
+| `P1.7main.c` | Sử dụng con trỏ hàm (function pointer) tạo menu tương tác. |
 | `P1.8 main.c` | File build hoàn thiện sau cùng: Tích hợp đầy đủ Menu LCD, LED 7 đoạn, nút nhấn, relay, motor và đọc nhiệt độ DS18B20 để chạy toàn bộ hệ thống mô phỏng. |
 | `userdef.h` | Định nghĩa địa chỉ thiết bị, nút nhấn, relay, motor, LCD, LED 7 đoạn và giao thức DS18B20. |
 | `build.ps1` | Script biên dịch `.c` thành `.hex`. |
@@ -146,7 +146,7 @@ REWARD = 2
 
 `P1.5 main code simulate lcd lm044l.c` tập trung kiểm tra LCD LM044L và hiển thị chữ trên bốn dòng.
 
-### P1.6 và P1.7 – Menu LCD
+### P1.6 và P1.7 – Tạo danh sách Menu LCD và sử dụng con trỏ hàm(function pointer) để tạo mennu tương tác
 
 Hai file dùng LCD LM044L và các nút nhấn để:
 
@@ -157,7 +157,7 @@ Hai file dùng LCD LM044L và các nút nhấn để:
 
 Menu có các nhóm Sensors, Actuator và Settings. Phần Actuator dùng chung các cấu trúc relay/motor trong `userdef.h`.
 
-### P1.8 – DS18B20
+### P1.8 – DS18B20 (FILE BUILD HOÀN THIỆN TOÀN BỘ MẠCH)
 
 P1.8 main.c là phiên bản tổng hợp hoàn chỉnh nhất, dùng để biên dịch nạp vào ATmega128 điều khiển toàn bộ mô phỏng Proteus:
 
