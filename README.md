@@ -4,6 +4,8 @@
 
 Project gồm các bài thực hành P1.2 đến P1.8 trên vi điều khiển **ATmega128**, biên dịch bằng **Microchip XC8 AVR** và mô phỏng bằng **Proteus**.
 
+Trong đó, P1.8 main.c là file build hoàn thiện sau cùng, tích hợp toàn bộ các khối chức năng (LCD, LED 7 đoạn, Nút nhấn, Relay, Motor DC và cảm biến DS18B20) để điều khiển và mô phỏng toàn bộ sơ đồ mạch Proteus. Các bài từ P1.2 đến P1.7 đóng vai trò là các bài thực hành và kiểm tra từng phần cứng riêng lẻ.
+
 Mỗi lần chỉ biên dịch **một file `.c`**. Các file dùng chung như `userdef.h` không được biên dịch riêng.
 
 ## 2. Cấu trúc file
@@ -17,7 +19,7 @@ Mỗi lần chỉ biên dịch **một file `.c`**. Các file dùng chung như `
 | `P1.5 main code simulate lcd lm044l.c` | Khởi tạo LCD LM044L và hiển thị menu cơ bản. |
 | `P1.6main.c` | Menu LCD kết hợp nút nhấn, relay và motor. |
 | `P1.7main.c` | Phiên bản menu LCD hoàn chỉnh hơn, có điều hướng bằng nút nhấn. |
-| `P1.8 main.c` | Menu LCD, LED 7 đoạn và đọc nhiệt độ DS18B20. |
+| `P1.8 main.c` | File build hoàn thiện sau cùng: Tích hợp đầy đủ Menu LCD, LED 7 đoạn, nút nhấn, relay, motor và đọc nhiệt độ DS18B20 để chạy toàn bộ hệ thống mô phỏng. |
 | `userdef.h` | Định nghĩa địa chỉ thiết bị, nút nhấn, relay, motor, LCD, LED 7 đoạn và giao thức DS18B20. |
 | `build.ps1` | Script biên dịch `.c` thành `.hex`. |
 | `.vscode/tasks.json` | Danh sách file để chọn khi nhấn `Ctrl + Shift + B`. |
